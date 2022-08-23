@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+    <!-- css -->
+    <script src="https://kit.fontawesome.com/b4c2bebdfd.js" crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="../static/css/style.css">
+    <!-- js -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <style>
+      .todo-background{
+   background: #de584e;
+    color: white;
+}
+
+
+.todo-input{
+    outline: none;
+    border:none;
+    border-radius: 5px;
+    padding: 6px 15px;
+    width:25%
+
+}
+
+.todo-button{
+    background: rgb(52, 138, 30);
+    color: white;
+    border-radius: 5px;
+}
+
+
+.todo-button2{
+    color:white;
+    size: 15px;
+    
+}
+
+.todo{
+    background:#4169E1;
+    color:white;
+    height: 90vh;
+}
+
+.todo-input{
+    outline: none;
+    border-radius: 5px;
+    padding: 6px 15px;
+    width:250px
+
+}
+
+.todo-button{
+    background: rgb(52, 138, 30);
+    color: white;
+    border-radius: 5px;
+}
+
+
+.todo-button-2{
+    background: rgb(52, 138, 30);
+    color: white;
+    border-radius: 5px;
+    max-width: 250px;
+    height: 45px;
+
+
+}
+
+    </style>
+<body class="todo-background" onload="loadData()">
+
+    <div class="container">
+            <div class="h2 text-center mt-3">TO DO</div>
+
+
+            <form  id="frm" class="text-center mb-5">
+              <input class="todo-input" id="text" type="text" required >
+              <button id="submit" type="submit" class="todo-button btn text-center"><i class="fa-solid fa-plus"></i></button>  
+            </form>
+
+
+          <div id="todos">
+           
+            <div class="alert alert-warning alert-dismissible">
+              <button type="button" class="close" data-dismiss="alert">&times;</button>
+              <strong>Warning!</strong> This alert box could indicate a warning that might need attention.
+            </div>
+          </div>
+            <!-- <button class="col-12 btn todo-button-2 mb-5 mt-3" type="button"  data-toggle="modal" data-target="#exampleModal" data-whatever="@mdo">Add</button> -->
+     
+      
+
+
+
+            
+
+        </div>
+
+    </div>
+    
+</body>
+<script>
+  let domain="http://localhost:4000"
+  let todobody=document.getElementById('todos')
+
+    function loadData(){
+      todobody.innerHTML=""
+      fetch(domain,{  
+        method:"GET",
+        headers:{
+          "Content-type":"application/json; charset=UTF-8"
+        }
+      })
+      .then((resp)=>resp.json())
+      .then((data)=>{
+        console.log(data.data)
+        data.data.forEach(t => {
+          todobody.innerHTML+=`
+          <div class="alert alert-warning alert-dismissible">
+              <button type="button" class="close" data-dismiss="alert" onclick="deleteTodo('${t.id}')">&times;</button>
+              ${t.text}
+            </div>
+          `
+        });
+      })
+      .catch((e)=>{
+        console.error(e)
+      })
+    }
+
+    function deleteTodo(id){
+      console.log(id)
+      fetch(domain+'/delete',{  
+        method:"POST",
+        body:JSON.stringify({id:id}),
+        headers:{
+          "Content-type":"application/json; charset=UTF-8"
+        }
+      })
+      .then((resp)=>resp.json())
+      .then((data)=>{
+        console.log(data)
+      })
+    }
+    
+    document.getElementById('frm').addEventListener('submit',function(e){
+      e.preventDefault()
+      let text=document.getElementById('text').value
+      fetch(domain+'/add',{  
+        method:"POST",
+        body:JSON.stringify({text:text}),
+        headers:{
+          "Content-type":"application/json; charset=UTF-8"
+        }
+      })
+      .then((resp)=>resp.json())
+      .then((data)=>{
+        if(data.success){
+          document.getElementById('text').value=''
+          loadData()
+        }
+      })
+    })
+</script>
+</html>
